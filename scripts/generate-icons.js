@@ -11,12 +11,15 @@ const colors = {
   gray: '#9CA3AF',
 };
 
-// Tray icon: un losange (diamond) plein.
+// Tray icon: le logo Asana (trois boules).
 async function generateTrayIcon(name, color, size) {
-  const c = size / 2;
-  const r = size * 0.42;
+  const r = size * 0.165;
+  const topY = size * 0.32;
+  const botY = size * 0.68;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <polygon points="${c},${c - r} ${c + r},${c} ${c},${c + r} ${c - r},${c}" fill="${color}"/>
+    <circle cx="${size * 0.5}" cy="${topY}" r="${r}" fill="${color}"/>
+    <circle cx="${size * 0.21}" cy="${botY}" r="${r}" fill="${color}"/>
+    <circle cx="${size * 0.79}" cy="${botY}" r="${r}" fill="${color}"/>
   </svg>`;
 
   const suffix = size === 32 ? '@2x' : '';

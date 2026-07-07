@@ -1,4 +1,4 @@
-# AsanaBar ◆
+# AsanaBar
 
 Application **macOS menu bar** pour [Asana](https://asana.com) : voir d'un coup d'œil les
 commentaires où l'on est **@mentionné** (les lire, les archiver, les ouvrir) et ses
@@ -9,7 +9,7 @@ fork de [BugSnagBar](https://github.com/yoanbernabeu/BugSnagBar) (Yoan Bernabeu,
 
 ## Fonctionnalités
 
-- ◆ **Icône losange** dans la barre de menus, colorée selon l'état :
+- **Logo Asana (les trois boules)** dans la barre de menus, coloré selon l'état :
   - 🔴 rouge — mentions non lues
   - 🟠 orange — tâches à échéance aujourd'hui (ou en retard)
   - 🟢 vert — tout est traité
@@ -24,7 +24,7 @@ fork de [BugSnagBar](https://github.com/yoanbernabeu/BugSnagBar) (Yoan Bernabeu,
 
 ## Configuration
 
-1. Lancer AsanaBar → clic sur le losange → **réglages**.
+1. Lancer AsanaBar → clic sur l'icône → **réglages**.
 2. Coller un **Personal Access Token** Asana
    (Asana → Settings → Apps → *Personal access tokens*).
 3. **Tester & enregistrer** — l'espace de travail est détecté automatiquement

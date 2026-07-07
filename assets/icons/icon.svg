@@ -6,6 +6,7 @@
     </linearGradient>
   </defs>
   <rect width="128" height="128" rx="24" fill="url(#grad)"/>
-  <polygon points="64,24 104,64 64,104 24,64" fill="white"/>
-  <polygon points="64,44 84,64 64,84 44,64" fill="url(#grad)"/>
+  <circle cx="64" cy="45" r="18" fill="white"/>
+  <circle cx="29" cy="85" r="18" fill="white"/>
+  <circle cx="99" cy="85" r="18" fill="white"/>
 </svg>

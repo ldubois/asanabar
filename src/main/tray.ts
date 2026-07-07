@@ -72,11 +72,15 @@ class TrayManager {
     };
     const [r, g, b] = colors[status];
 
-    // Losange (diamond) centred in the 16px canvas: |dx| + |dy| <= radius.
-    const cx = size / 2;
-    const cy = size / 2;
-    const radius = size / 2 - 1.5;
-    const inside = (px: number, py: number) => Math.abs(px - cx) + Math.abs(py - cy) <= radius;
+    // Logo Asana (trois boules) dans le canvas 16px.
+    const radius = size * 0.165;
+    const centers: [number, number][] = [
+      [size * 0.5, size * 0.32],
+      [size * 0.21, size * 0.68],
+      [size * 0.79, size * 0.68],
+    ];
+    const inside = (px: number, py: number) =>
+      centers.some(([cx, cy]) => (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2);
 
     // 3x3 supersampling for anti-aliased edges.
     for (let y = 0; y < size; y++) {
