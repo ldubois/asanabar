@@ -32,7 +32,17 @@ export function setupIpcHandlers(): void {
     const body = String(text ?? '').trim();
     if (!body) return { success: false, error: 'Commentaire vide' };
     const ok = await client.addComment(String(taskGid), body);
+    // Replying marks the mention as handled: refresh in the background.
+    if (ok) pollingService.refresh();
     return ok ? { success: true } : { success: false, error: "Échec de l'envoi" };
+  });
+
+  ipcMain.handle(IPC_CHANNELS.MENTION_MARK_SEEN, async (_, storyGid: string) => {
+    const client = buildAsanaClient();
+    if (!client) return { success: false, error: 'Asana non configuré' };
+    const ok = await client.likeStory(String(storyGid));
+    if (ok) pollingService.refresh();
+    return ok ? { success: true } : { success: false, error: 'Échec du like' };
   });
 
   // ===== Configuration =====

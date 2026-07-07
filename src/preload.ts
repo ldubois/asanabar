@@ -5,6 +5,7 @@ const IPC_CHANNELS = {
   ASANA_REFRESH: 'asana:refresh',
   ASANA_VALIDATE: 'asana:validate',
   MENTION_COMMENT: 'mention:comment',
+  MENTION_MARK_SEEN: 'mention:markSeen',
   CONFIG_GET: 'config:get',
   CONFIG_SET: 'config:set',
   CONFIG_GET_ALL: 'config:getAll',
@@ -27,6 +28,7 @@ const api = {
 
   mentions: {
     comment: (taskGid: string, text: string) => ipcRenderer.invoke(IPC_CHANNELS.MENTION_COMMENT, taskGid, text),
+    markSeen: (storyGid: string) => ipcRenderer.invoke(IPC_CHANNELS.MENTION_MARK_SEEN, storyGid),
   },
 
   config: {

@@ -12,6 +12,7 @@ interface AsanaBarAPI {
 
   mentions: {
     comment: (taskGid: string, text: string) => Promise<{ success: boolean; error?: string }>;
+    markSeen: (storyGid: string) => Promise<{ success: boolean; error?: string }>;
   };
 
   config: {

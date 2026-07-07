@@ -6,6 +6,7 @@ export const IPC_CHANNELS = {
 
   // Mentions
   MENTION_COMMENT: 'mention:comment',
+  MENTION_MARK_SEEN: 'mention:markSeen',
 
   // Configuration
   CONFIG_GET: 'config:get',

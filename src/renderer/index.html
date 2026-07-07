@@ -288,6 +288,7 @@
           <div class="card-actions">
             <button class="card-btn card-btn-primary" data-open="${escapeHtml(m.url)}">Ouvrir</button>
             <button class="card-btn card-btn-secondary" data-comment-toggle="${escapeHtml(m.taskGid)}">Commenter</button>
+            <button class="card-btn card-btn-secondary" data-seen="${escapeHtml(m.storyGid)}" title="Like le commentaire dans Asana = vu partout">👍 Vu</button>
           </div>
           <div class="comment-area">
             <textarea class="comment-box" data-comment-box="${escapeHtml(m.taskGid)}" placeholder="Répondre à ${escapeHtml(m.author)}…"></textarea>
@@ -387,6 +388,16 @@
           e.stopPropagation();
           await bridge.app.copyToClipboard(btn.dataset.copy);
           flashButton(btn, 'Copié ✓');
+        });
+      });
+
+      container.querySelectorAll('[data-seen]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          btn.disabled = true; btn.textContent = '👍 …';
+          const res = await bridge.mentions.markSeen(btn.dataset.seen);
+          if (!res.success) { btn.disabled = false; btn.textContent = '👍 Vu'; }
+          // Succès : le refresh déclenché côté main fait disparaître la carte.
         });
       });
 

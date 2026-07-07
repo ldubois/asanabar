@@ -16,7 +16,10 @@ fork de [BugSnagBar](https://github.com/yoanbernabeu/BugSnagBar) (Yoan Bernabeu,
   - ⚪ gris — non configuré / erreur
 - **Mentions** : commentaires des 14 derniers jours (fenêtre réglable) où quelqu'un t'a
   @mentionné. Clic pour lire le commentaire complet, **Ouvrir** dans Asana, **Commenter**
-  pour répondre directement dans la tâche. Pas de cache local : la liste reflète Asana.
+  pour répondre directement dans la tâche, **👍 Vu** pour marquer comme traité.
+  Aucun état local : « vu » = un like sur le commentaire dans Asana (visible par l'auteur,
+  partagé entre tous tes Macs), et répondre dans la tâche masque aussi la mention.
+  (L'API Asana n'expose pas la boîte de réception : l'archivage inbox n'est pas accessible.)
 - **Aujourd'hui** : tes tâches assignées dues aujourd'hui ou en retard, avec
   **Copier le lien** par tâche et **Copier les N liens** en une fois.
 - **Notifications macOS** à l'arrivée d'une nouvelle mention (clic → ouvre la tâche).

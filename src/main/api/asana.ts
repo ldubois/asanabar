@@ -30,6 +30,8 @@ interface RawStory {
   created_by?: { gid: string; name: string };
   text?: string;
   html_text?: string;
+  /** True when the *current* user liked this story. */
+  liked?: boolean;
 }
 
 /** How many recently-modified tasks we scan for mentions on each poll. */
@@ -90,10 +92,17 @@ export class AsanaClient {
       while (cursor < tasks.length) {
         const task = tasks[cursor++];
         const stories = await this.getStories(task.gid);
+        // A mention is "handled" once I replied on the task afterwards.
+        const myLastComment = stories
+          .filter((s) => s.resource_subtype === 'comment_added' && s.created_by?.gid === userGid)
+          .reduce((max, s) => (s.created_at && s.created_at > max ? s.created_at : max), '');
         for (const s of stories) {
           if (s.resource_subtype !== 'comment_added') continue;
           if (!s.created_at || new Date(s.created_at) < since) continue;
           if (s.created_by?.gid === userGid) continue;
+          // Liked by me = seen; replied after = handled. Both states live in Asana.
+          if (s.liked) continue;
+          if (myLastComment && myLastComment > s.created_at) continue;
           const html = s.html_text ?? '';
           const isMention =
             html.includes(`data-asana-gid="${userGid}"`) || html.includes(`/profile/${userGid}`);
@@ -116,6 +125,16 @@ export class AsanaClient {
 
     mentions.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
     return mentions;
+  }
+
+  /** Like a story (used as a cross-device "seen" marker). */
+  async likeStory(storyGid: string): Promise<boolean> {
+    try {
+      await this.client.put(`/stories/${storyGid}`, { data: { liked: true } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /** Post a comment on a task. Returns true on success. */
@@ -211,7 +230,7 @@ export class AsanaClient {
         params: {
           limit: 100,
           offset,
-          opt_fields: 'type,resource_subtype,created_at,created_by.gid,created_by.name,text,html_text',
+          opt_fields: 'type,resource_subtype,created_at,created_by.gid,created_by.name,text,html_text,liked',
         },
       });
       stories.push(...(res.data?.data ?? []));
