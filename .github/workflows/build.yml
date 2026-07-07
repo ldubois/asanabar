@@ -29,8 +29,11 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
-      - name: Build application
-        run: npm run make
+      - name: Build application (Apple Silicon)
+        run: npm run make -- --arch=arm64
+
+      - name: Build application (Intel)
+        run: npm run make -- --arch=x64
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4

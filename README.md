@@ -51,8 +51,8 @@ npm run generate-icons
 
 ## Installation
 
-Télécharger le DMG depuis les [Releases](https://github.com/ldubois/asanabar/releases),
-ou :
+Télécharger le DMG depuis les [Releases](https://github.com/ldubois/asanabar/releases)
+(`arm64` = Apple Silicon, `x64` = Mac Intel), ou :
 
 ```sh
 ./install.sh
