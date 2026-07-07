@@ -11,8 +11,7 @@ interface AsanaBarAPI {
   };
 
   mentions: {
-    archive: (storyGid: string) => Promise<{ success: boolean }>;
-    restoreAll: () => Promise<{ success: boolean }>;
+    comment: (taskGid: string, text: string) => Promise<{ success: boolean; error?: string }>;
   };
 
   config: {

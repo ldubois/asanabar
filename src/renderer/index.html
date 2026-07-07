@@ -131,6 +131,17 @@
     .badge-today { background: rgba(245, 158, 11, 0.2); color: var(--accent-orange); }
     .badge-done { background: rgba(16, 185, 129, 0.18); color: var(--accent-green); }
 
+    /* COMMENT BOX */
+    .comment-area { display: none; margin-top: 10px; }
+    .card.commenting .comment-area { display: block; }
+    .comment-box {
+      width: 100%; min-height: 56px; resize: vertical; padding: 9px 11px; margin-bottom: 8px;
+      background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+      color: var(--text-primary); font-size: 12px; font-family: inherit; outline: none; transition: all 0.2s ease;
+    }
+    .comment-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .comment-box::placeholder { color: var(--text-tertiary); }
+
     .card-actions { display: flex; gap: 8px; margin-top: 10px; }
     .card-btn {
       flex: 1; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
@@ -161,8 +172,6 @@
     .status-dot.error { background: var(--accent-red); }
     .status-dot.warning { background: var(--accent-orange); }
     .status-dot.inactive { background: var(--text-tertiary); }
-    .restore-link { color: var(--accent); cursor: pointer; }
-    .restore-link:hover { opacity: 0.8; }
   </style>
 </head>
 <body>
@@ -198,7 +207,6 @@
       <div class="status-dot inactive" id="statusDot"></div>
       <span id="lastUpdated">Jamais rafraîchi</span>
     </div>
-    <span class="restore-link" id="restoreBtn" style="display:none"></span>
   </div>
 
   <script>
@@ -212,10 +220,6 @@
     document.getElementById('prefsBtn').addEventListener('click', () => {
       if (bridge) bridge.app.showPreferences();
     });
-    document.getElementById('restoreBtn').addEventListener('click', async () => {
-      if (bridge) await bridge.mentions.restoreAll();
-    });
-
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text == null ? '' : String(text);
@@ -283,7 +287,13 @@
           </div>
           <div class="card-actions">
             <button class="card-btn card-btn-primary" data-open="${escapeHtml(m.url)}">Ouvrir</button>
-            <button class="card-btn card-btn-secondary" data-archive="${escapeHtml(m.storyGid)}">Archiver</button>
+            <button class="card-btn card-btn-secondary" data-comment-toggle="${escapeHtml(m.taskGid)}">Commenter</button>
+          </div>
+          <div class="comment-area">
+            <textarea class="comment-box" data-comment-box="${escapeHtml(m.taskGid)}" placeholder="Répondre à ${escapeHtml(m.author)}…"></textarea>
+            <div class="card-actions" style="margin-top:0">
+              <button class="card-btn card-btn-primary" data-comment-send="${escapeHtml(m.taskGid)}">Envoyer</button>
+            </div>
           </div>
         </div>`;
     }
@@ -312,7 +322,6 @@
     function render(data) {
       const container = document.getElementById('mainContent');
       const badge = document.getElementById('mentionBadge');
-      const restoreBtn = document.getElementById('restoreBtn');
       const mentions = data.mentions || [];
       const tasks = data.todayTasks || [];
 
@@ -321,7 +330,6 @@
         const go = document.getElementById('goPrefs');
         if (go) go.addEventListener('click', () => bridge && bridge.app.showPreferences());
         badge.style.display = 'none';
-        restoreBtn.style.display = 'none';
         return;
       }
 
@@ -337,7 +345,7 @@
         html += '<div class="section-head">Mentions <span class="section-count">' + mentions.length + '</span></div>';
         html += mentions.length
           ? mentions.map(mentionCard).join('')
-          : '<div class="section-empty">Aucune mention non archivée.</div>';
+          : '<div class="section-empty">Aucune mention récente.</div>';
 
         html += '<div class="section-head">Aujourd\'hui <span class="section-count">' + tasks.length + '</span><span class="section-spacer"></span>'
           + (tasks.length ? '<button class="section-action" id="copyAllBtn">Copier les ' + tasks.length + ' liens</button>' : '')
@@ -348,14 +356,6 @@
 
         container.innerHTML = html;
         wireEvents(container, tasks);
-      }
-
-      // Footer: restore archived mentions.
-      if (data.archivedCount > 0) {
-        restoreBtn.textContent = 'Réafficher les archivées (' + data.archivedCount + ')';
-        restoreBtn.style.display = 'inline';
-      } else {
-        restoreBtn.style.display = 'none';
       }
     }
 
@@ -390,11 +390,42 @@
         });
       });
 
-      container.querySelectorAll('[data-archive]').forEach(btn => {
+      container.querySelectorAll('[data-comment-toggle]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = btn.closest('.card');
+          card.classList.toggle('commenting');
+          if (card.classList.contains('commenting')) {
+            card.classList.add('expanded');
+            card.querySelector('.comment-box').focus();
+          }
+        });
+      });
+
+      container.querySelectorAll('.comment-box').forEach(box => {
+        box.addEventListener('click', (e) => e.stopPropagation());
+      });
+
+      container.querySelectorAll('[data-comment-send]').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
-          btn.disabled = true;
-          await bridge.mentions.archive(btn.dataset.archive);
+          const gid = btn.dataset.commentSend;
+          const box = container.querySelector(`.comment-box[data-comment-box="${gid}"]`);
+          const text = (box && box.value.trim()) || '';
+          if (!text) { box && box.focus(); return; }
+          btn.disabled = true; btn.textContent = 'Envoi…';
+          const res = await bridge.mentions.comment(gid, text);
+          if (res.success) {
+            btn.textContent = 'Envoyé ✓';
+            box.value = '';
+            setTimeout(() => {
+              btn.disabled = false; btn.textContent = 'Envoyer';
+              const card = btn.closest('.card');
+              if (card) card.classList.remove('commenting');
+            }, 1200);
+          } else {
+            btn.disabled = false; btn.textContent = 'Réessayer';
+          }
         });
       });
 

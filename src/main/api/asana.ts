@@ -118,6 +118,16 @@ export class AsanaClient {
     return mentions;
   }
 
+  /** Post a comment on a task. Returns true on success. */
+  async addComment(taskGid: string, text: string): Promise<boolean> {
+    try {
+      await this.client.post(`/tasks/${taskGid}/stories`, { data: { text } });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   /** Incomplete tasks assigned to me and due today or earlier. */
   async getTodayTasks(workspaceGid: string): Promise<TodayTask[]> {
     const res = await this.client.get('/tasks', {

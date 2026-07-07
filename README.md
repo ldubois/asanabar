@@ -1,7 +1,7 @@
 # AsanaBar
 
 Application **macOS menu bar** pour [Asana](https://asana.com) : voir d'un coup d'œil les
-commentaires où l'on est **@mentionné** (les lire, les archiver, les ouvrir) et ses
+commentaires où l'on est **@mentionné** (les lire, y répondre, les ouvrir) et ses
 **tâches du jour** (copier les liens en un clic).
 
 Basée sur le squelette de [JitBitBar](https://github.com/ldubois/jitbitbar), lui-même
@@ -15,8 +15,8 @@ fork de [BugSnagBar](https://github.com/yoanbernabeu/BugSnagBar) (Yoan Bernabeu,
   - 🟢 vert — tout est traité
   - ⚪ gris — non configuré / erreur
 - **Mentions** : commentaires des 14 derniers jours (fenêtre réglable) où quelqu'un t'a
-  @mentionné. Clic pour lire le commentaire complet, **Ouvrir** dans Asana, **Archiver**
-  localement (réaffichage possible depuis le pied de page).
+  @mentionné. Clic pour lire le commentaire complet, **Ouvrir** dans Asana, **Commenter**
+  pour répondre directement dans la tâche. Pas de cache local : la liste reflète Asana.
 - **Aujourd'hui** : tes tâches assignées dues aujourd'hui ou en retard, avec
   **Copier le lien** par tâche et **Copier les N liens** en une fois.
 - **Notifications macOS** à l'arrivée d'une nouvelle mention (clic → ouvre la tâche).

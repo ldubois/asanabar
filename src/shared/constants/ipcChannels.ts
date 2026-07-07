@@ -4,9 +4,8 @@ export const IPC_CHANNELS = {
   ASANA_REFRESH: 'asana:refresh',
   ASANA_VALIDATE: 'asana:validate',
 
-  // Mentions (local archive)
-  MENTION_ARCHIVE: 'mention:archive',
-  MENTION_RESTORE_ALL: 'mention:restoreAll',
+  // Mentions
+  MENTION_COMMENT: 'mention:comment',
 
   // Configuration
   CONFIG_GET: 'config:get',

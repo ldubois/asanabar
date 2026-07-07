@@ -10,8 +10,6 @@ export type { TrayStatus };
 export interface PollingData {
   mentions: Mention[];
   todayTasks: TodayTask[];
-  /** Number of mentions hidden by local archiving. */
-  archivedCount: number;
   lastUpdated: Date;
   status: TrayStatus;
   error?: string;
@@ -33,7 +31,6 @@ class PollingService {
   private lastData: PollingData = {
     mentions: [],
     todayTasks: [],
-    archivedCount: 0,
     lastUpdated: new Date(),
     status: 'gray',
   };
@@ -73,7 +70,6 @@ class PollingService {
         this.lastData = {
           mentions: [],
           todayTasks: [],
-          archivedCount: 0,
           lastUpdated: new Date(),
           status: 'gray',
         };
@@ -91,7 +87,6 @@ class PollingService {
       this.lastData = {
         mentions,
         todayTasks,
-        archivedCount: 0,
         lastUpdated: new Date(),
         status: 'green',
       };
@@ -113,42 +108,25 @@ class PollingService {
     }
   }
 
-  private visibleMentions(mentions: Mention[]): Mention[] {
-    const archived = new Set(config.get('archivedStories') || []);
-    return mentions.filter((m) => !archived.has(m.storyGid));
-  }
-
   private calculateStatus(): TrayStatus {
     if (!config.get('workspaceGid') || !keychain.hasToken('asana')) return 'gray';
-    if (this.visibleMentions(this.lastData.mentions).length > 0) return 'red';
+    if (this.lastData.mentions.length > 0) return 'red';
     if (this.lastData.todayTasks.length > 0) return 'orange';
     return 'green';
   }
 
   private emitUpdate(): void {
-    const visible = this.visibleMentions(this.lastData.mentions);
-    const dataForRenderer: PollingData = {
-      ...this.lastData,
-      mentions: visible,
-      archivedCount: this.lastData.mentions.length - visible.length,
-    };
-
-    if (this.onDataUpdate) this.onDataUpdate(dataForRenderer);
+    if (this.onDataUpdate) this.onDataUpdate(this.lastData);
 
     BrowserWindow.getAllWindows().forEach((window) => {
       if (!window.isDestroyed()) {
-        window.webContents.send(IPC_CHANNELS.DATA_UPDATED, dataForRenderer);
+        window.webContents.send(IPC_CHANNELS.DATA_UPDATED, this.lastData);
       }
     });
   }
 
   getData(): PollingData {
-    const visible = this.visibleMentions(this.lastData.mentions);
-    return {
-      ...this.lastData,
-      mentions: visible,
-      archivedCount: this.lastData.mentions.length - visible.length,
-    };
+    return this.lastData;
   }
 
   recalculateStatus(): void {

@@ -30,9 +30,8 @@ export function checkNewMentions(oldMentions: Mention[], newMentions: Mention[])
     return;
   }
   const oldIds = new Set(oldMentions.map((m) => m.storyGid));
-  const archived = new Set(config.get('archivedStories') || []);
   for (const mention of newMentions) {
-    if (!oldIds.has(mention.storyGid) && !archived.has(mention.storyGid)) {
+    if (!oldIds.has(mention.storyGid)) {
       notifyNewMention(mention);
     }
   }

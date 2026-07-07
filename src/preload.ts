@@ -4,8 +4,7 @@ const IPC_CHANNELS = {
   ASANA_GET_DATA: 'asana:getData',
   ASANA_REFRESH: 'asana:refresh',
   ASANA_VALIDATE: 'asana:validate',
-  MENTION_ARCHIVE: 'mention:archive',
-  MENTION_RESTORE_ALL: 'mention:restoreAll',
+  MENTION_COMMENT: 'mention:comment',
   CONFIG_GET: 'config:get',
   CONFIG_SET: 'config:set',
   CONFIG_GET_ALL: 'config:getAll',
@@ -27,8 +26,7 @@ const api = {
   },
 
   mentions: {
-    archive: (storyGid: string) => ipcRenderer.invoke(IPC_CHANNELS.MENTION_ARCHIVE, storyGid),
-    restoreAll: () => ipcRenderer.invoke(IPC_CHANNELS.MENTION_RESTORE_ALL),
+    comment: (taskGid: string, text: string) => ipcRenderer.invoke(IPC_CHANNELS.MENTION_COMMENT, taskGid, text),
   },
 
   config: {

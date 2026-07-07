@@ -2,7 +2,7 @@ import { ipcMain, shell, app, clipboard } from 'electron';
 import { IPC_CHANNELS } from '../../shared/constants/ipcChannels';
 import { config } from '../store/config';
 import { keychain } from '../store/keychain';
-import { pollingService } from '../services/polling';
+import { pollingService, buildAsanaClient } from '../services/polling';
 import { trayManager } from '../tray';
 import { AsanaClient } from '../api/asana';
 import { AppConfig } from '../../shared/types';
@@ -24,18 +24,15 @@ export function setupIpcHandlers(): void {
     return { valid: true, name: me.name, gid: me.gid, workspaces: me.workspaces };
   });
 
-  // ===== Mentions (local archive) =====
+  // ===== Mentions =====
 
-  ipcMain.handle(IPC_CHANNELS.MENTION_ARCHIVE, (_, storyGid: string) => {
-    config.archiveStory(String(storyGid));
-    pollingService.recalculateStatus();
-    return { success: true };
-  });
-
-  ipcMain.handle(IPC_CHANNELS.MENTION_RESTORE_ALL, () => {
-    config.restoreAllStories();
-    pollingService.recalculateStatus();
-    return { success: true };
+  ipcMain.handle(IPC_CHANNELS.MENTION_COMMENT, async (_, taskGid: string, text: string) => {
+    const client = buildAsanaClient();
+    if (!client) return { success: false, error: 'Asana non configuré' };
+    const body = String(text ?? '').trim();
+    if (!body) return { success: false, error: 'Commentaire vide' };
+    const ok = await client.addComment(String(taskGid), body);
+    return ok ? { success: true } : { success: false, error: "Échec de l'envoi" };
   });
 
   // ===== Configuration =====

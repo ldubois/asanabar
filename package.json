@@ -1,8 +1,8 @@
 {
   "name": "asanabar",
   "productName": "AsanaBar",
-  "version": "0.1.1",
-  "description": "Application macOS menu bar pour Asana — voir les commentaires où l'on est mentionné (lire, archiver, ouvrir) et copier les liens de ses tâches du jour",
+  "version": "0.1.2",
+  "description": "Application macOS menu bar pour Asana — voir les commentaires où l'on est mentionné (lire, répondre, ouvrir) et copier les liens de ses tâches du jour",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",

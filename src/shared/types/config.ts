@@ -19,8 +19,6 @@ export interface AppConfig {
   launchAtStartup: boolean;
   notifications: NotificationConfig;
   theme: 'system' | 'light' | 'dark';
-  /** Story gids archived locally (hidden from the popover). */
-  archivedStories: string[];
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
@@ -36,5 +34,4 @@ export const DEFAULT_CONFIG: AppConfig = {
     newMention: true,
   },
   theme: 'system',
-  archivedStories: [],
 };
