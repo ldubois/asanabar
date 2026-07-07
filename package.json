@@ -1,7 +1,7 @@
 {
   "name": "asanabar",
   "productName": "AsanaBar",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Application macOS menu bar pour Asana — voir les commentaires où l'on est mentionné (lire, répondre, ouvrir) et copier les liens de ses tâches du jour",
   "main": ".vite/build/main.js",
   "scripts": {

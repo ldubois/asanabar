@@ -92,10 +92,11 @@ class TrayManager {
           }
         }
         if (hits === 0) continue;
+        // createFromBuffer attend du BGRA (bitmap Chromium), pas du RGBA.
         const offset = (y * size + x) * 4;
-        canvas[offset] = r;
+        canvas[offset] = b;
         canvas[offset + 1] = g;
-        canvas[offset + 2] = b;
+        canvas[offset + 2] = r;
         canvas[offset + 3] = Math.round((hits / 9) * 255);
       }
     }
@@ -104,7 +105,7 @@ class TrayManager {
   }
 
   initialize(): void {
-    const icon = this.createFallbackIcon('gray');
+    const icon = this.createTrayIcon('gray');
     this.tray = new Tray(icon);
     this.tray.setToolTip('AsanaBar');
 
@@ -273,7 +274,7 @@ class TrayManager {
   updateIcon(status: TrayStatus): void {
     if (!this.tray || this.currentStatus === status) return;
     this.currentStatus = status;
-    const icon = this.createFallbackIcon(status);
+    const icon = this.createTrayIcon(status);
     this.tray.setImage(icon);
   }
 
