@@ -1,4 +1,7 @@
 import { ipcMain, shell, app, clipboard } from 'electron';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { IPC_CHANNELS } from '../../shared/constants/ipcChannels';
 import { config } from '../store/config';
 import { keychain } from '../store/keychain';
@@ -43,6 +46,51 @@ export function setupIpcHandlers(): void {
     const ok = await client.likeStory(String(storyGid));
     if (ok) pollingService.refresh();
     return ok ? { success: true } : { success: false, error: 'Échec du like' };
+  });
+
+  // ===== Tasks =====
+
+  // Opens a Warp session in the configured project dir and runs the configured
+  // command (e.g. `claude "/asana-task <url>"`). Warp has no CLI for this: the
+  // supported way is a launch-configuration YAML opened via warp://launch/<path>.
+  ipcMain.handle(IPC_CHANNELS.TASK_OPEN_IN_WARP, async (_, taskUrl: string) => {
+    try {
+      const url = String(taskUrl ?? '').trim();
+      if (!/^https:\/\/app\.asana\.com\//.test(url)) {
+        return { success: false, error: 'URL Asana invalide' };
+      }
+      const home = os.homedir();
+      const projectDir = String(config.get('warpProjectDir') || '').trim().replace(/^~(?=\/|$)/, home);
+      const template = String(config.get('warpCommand') || '').trim();
+      if (!projectDir || !template) {
+        return { success: false, error: 'Warp non configuré (réglages → Général)' };
+      }
+      const command = template.split('{url}').join(url);
+
+      const yamlQuote = (v: string) => '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+      const yaml = [
+        '---',
+        'name: asanabar-task',
+        'windows:',
+        '  - tabs:',
+        '      - title: ' + yamlQuote(path.basename(projectDir)),
+        '        layout:',
+        '          cwd: ' + yamlQuote(projectDir),
+        '          commands:',
+        '            - exec: ' + yamlQuote(command),
+        '',
+      ].join('\n');
+
+      const configDir = path.join(home, '.warp', 'launch_configurations');
+      fs.mkdirSync(configDir, { recursive: true });
+      const file = path.join(configDir, 'asanabar-task.yaml');
+      fs.writeFileSync(file, yaml, 'utf8');
+
+      await shell.openExternal('warp://launch/' + file);
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e?.message || 'Échec du lancement Warp' };
+    }
   });
 
   // ===== Configuration =====

@@ -23,6 +23,7 @@ interface AsanaBarAPI {
 
   app: {
     openExternal: (url: string) => Promise<any>;
+    openInWarp: (taskUrl: string) => Promise<{ success: boolean; error?: string }>;
     copyToClipboard: (text: string) => Promise<{ success: boolean }>;
     showPreferences: () => Promise<any>;
     quit: () => Promise<any>;

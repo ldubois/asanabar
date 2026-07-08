@@ -8,6 +8,9 @@ export const IPC_CHANNELS = {
   MENTION_COMMENT: 'mention:comment',
   MENTION_MARK_SEEN: 'mention:markSeen',
 
+  // Tasks
+  TASK_OPEN_IN_WARP: 'task:openInWarp',
+
   // Configuration
   CONFIG_GET: 'config:get',
   CONFIG_SET: 'config:set',

@@ -178,6 +178,29 @@
         </select>
         <div class="form-hint">Ancienneté maximale des commentaires affichés dans « Mentions ».</div>
       </div>
+      <div class="section-title">Ouvrir dans Warp</div>
+      <div class="settings-card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Bouton « ⌁ Warp » sur les tâches</div>
+            <div class="toggle-desc">Ouvre une session Warp dans le projet et y lance la commande ci-dessous</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="warpEnabled" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Répertoire projet</label>
+        <input type="text" class="form-input" id="warpProjectDir" placeholder="~/Dev/grenouille">
+        <div class="form-hint">Répertoire dans lequel la session Warp démarre.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Commande</label>
+        <input type="text" class="form-input" id="warpCommand" placeholder='claude "/asana-task {url}"'>
+        <div class="form-hint">{url} est remplacé par le lien de la tâche Asana.</div>
+      </div>
       <div class="section-title">Notifications</div>
       <div class="settings-card">
         <div class="toggle-row">
@@ -299,6 +322,15 @@
     document.getElementById('mentionsDays').addEventListener('change', async function () {
       await bridge.config.set('mentionsDays', parseInt(this.value));
     });
+    document.getElementById('warpEnabled').addEventListener('change', async function () {
+      await bridge.config.set('warpEnabled', this.checked);
+    });
+    document.getElementById('warpProjectDir').addEventListener('change', async function () {
+      await bridge.config.set('warpProjectDir', this.value.trim());
+    });
+    document.getElementById('warpCommand').addEventListener('change', async function () {
+      await bridge.config.set('warpCommand', this.value.trim());
+    });
     document.getElementById('notifyNewMention').addEventListener('change', async function () {
       const cfg = await bridge.config.getAll();
       const notifs = cfg.notifications || { enabled: true, newMention: true };
@@ -313,6 +345,9 @@
       if (cfg.hasAsanaToken) document.getElementById('asanaToken').placeholder = '•••••••• (enregistré)';
       document.getElementById('refreshInterval').value = cfg.refreshInterval || 120000;
       document.getElementById('mentionsDays').value = cfg.mentionsDays || 14;
+      document.getElementById('warpEnabled').checked = cfg.warpEnabled !== false;
+      document.getElementById('warpProjectDir').value = cfg.warpProjectDir || '';
+      document.getElementById('warpCommand').value = cfg.warpCommand || '';
       if (cfg.notifications) document.getElementById('notifyNewMention').checked = cfg.notifications.newMention !== false;
       renderCurrentAccount(cfg.userName || '', cfg.workspaceName || '');
       if (cfg.workspaceGid && cfg.workspaceName) {

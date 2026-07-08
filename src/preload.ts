@@ -6,6 +6,7 @@ const IPC_CHANNELS = {
   ASANA_VALIDATE: 'asana:validate',
   MENTION_COMMENT: 'mention:comment',
   MENTION_MARK_SEEN: 'mention:markSeen',
+  TASK_OPEN_IN_WARP: 'task:openInWarp',
   CONFIG_GET: 'config:get',
   CONFIG_SET: 'config:set',
   CONFIG_GET_ALL: 'config:getAll',
@@ -39,6 +40,7 @@ const api = {
 
   app: {
     openExternal: (url: string) => ipcRenderer.invoke(IPC_CHANNELS.APP_OPEN_EXTERNAL, url),
+    openInWarp: (taskUrl: string) => ipcRenderer.invoke(IPC_CHANNELS.TASK_OPEN_IN_WARP, taskUrl),
     copyToClipboard: (text: string) => ipcRenderer.invoke(IPC_CHANNELS.APP_COPY_TO_CLIPBOARD, text),
     showPreferences: () => ipcRenderer.invoke(IPC_CHANNELS.APP_SHOW_PREFERENCES),
     quit: () => ipcRenderer.invoke(IPC_CHANNELS.APP_QUIT),

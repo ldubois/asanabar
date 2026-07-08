@@ -19,6 +19,13 @@ export interface AppConfig {
   launchAtStartup: boolean;
   notifications: NotificationConfig;
   theme: 'system' | 'light' | 'dark';
+
+  /** Show the « Warp » button on task cards. */
+  warpEnabled: boolean;
+  /** Directory the Warp session starts in (~ allowed). */
+  warpProjectDir: string;
+  /** Command run in the Warp session; {url} is replaced by the task permalink. */
+  warpCommand: string;
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
@@ -34,4 +41,8 @@ export const DEFAULT_CONFIG: AppConfig = {
     newMention: true,
   },
   theme: 'system',
+
+  warpEnabled: true,
+  warpProjectDir: '~/Dev/grenouille',
+  warpCommand: 'claude "/asana-task {url}"',
 };

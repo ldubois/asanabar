@@ -22,6 +22,14 @@ fork de [BugSnagBar](https://github.com/yoanbernabeu/BugSnagBar) (Yoan Bernabeu,
   (L'API Asana n'expose pas la boîte de réception : l'archivage inbox n'est pas accessible.)
 - **Aujourd'hui** : tes tâches assignées dues aujourd'hui ou en retard, avec
   **Copier le lien** par tâche et **Copier les N liens** en une fois.
+- **⌁ Warp** : bouton par tâche qui ouvre une session [Warp](https://www.warp.dev)
+  dans un répertoire projet et y lance une commande (par défaut
+  `claude "/asana-task {url}"`, `{url}` étant remplacé par le lien de la tâche).
+  Répertoire, commande et activation réglables dans **Réglages → Général →
+  Ouvrir dans Warp**. Techniquement : AsanaBar écrit une
+  [launch configuration](https://docs.warp.dev/terminal/sessions/launch-configurations)
+  dans `~/.warp/launch_configurations/asanabar-task.yaml` puis l'ouvre via
+  l'URI `warp://launch/…`.
 - **Notifications macOS** à l'arrivée d'une nouvelle mention (clic → ouvre la tâche).
 - Thème clair/sombre automatique.
 

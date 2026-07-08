@@ -267,6 +267,7 @@
     }
 
     let isConfigured = false;
+    let warpEnabled = false;
 
     function mentionCard(m) {
       return `
@@ -315,6 +316,7 @@
           </div>
           <div class="card-actions">
             <button class="card-btn card-btn-secondary" data-copy="${escapeHtml(t.url)}">Copier le lien</button>
+            ${warpEnabled ? '<button class="card-btn card-btn-secondary" data-warp="' + escapeHtml(t.url) + '" title="Ouvrir une session Claude dans Warp (/asana-task)">⌁ Warp</button>' : ''}
             <button class="card-btn card-btn-primary" data-open="${escapeHtml(t.url)}">Ouvrir</button>
           </div>
         </div>`;
@@ -388,6 +390,17 @@
           e.stopPropagation();
           await bridge.app.copyToClipboard(btn.dataset.copy);
           flashButton(btn, 'Copié ✓');
+        });
+      });
+
+      container.querySelectorAll('[data-warp]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const original = btn.textContent;
+          btn.disabled = true; btn.textContent = '…';
+          const res = await bridge.app.openInWarp(btn.dataset.warp);
+          btn.textContent = res && res.success ? 'Lancé ✓' : (res && res.error) || 'Erreur';
+          setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1800);
         });
       });
 
@@ -468,9 +481,16 @@
       try {
         const cfg = await bridge.config.getAll();
         isConfigured = !!(cfg && cfg.hasAsanaToken && cfg.workspaceGid && cfg.userGid);
+        warpEnabled = !!(cfg && cfg.warpEnabled);
       } catch (e) { isConfigured = false; }
 
-      bridge.on.dataUpdated((data) => {
+      bridge.on.dataUpdated(async (data) => {
+        // Re-read the config so preference changes (token, Warp) apply on the next refresh.
+        try {
+          const cfg = await bridge.config.getAll();
+          isConfigured = !!(cfg && cfg.hasAsanaToken && cfg.workspaceGid && cfg.userGid);
+          warpEnabled = !!(cfg && cfg.warpEnabled);
+        } catch (e) { /* keep previous flags */ }
         render(data);
         updateStatus(data);
       });
