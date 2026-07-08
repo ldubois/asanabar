@@ -86,7 +86,10 @@ export function setupIpcHandlers(): void {
         '',
       ].join('\n');
 
-      const configDir = path.join(home, '.warp', 'tab_configs');
+      // Windows : Warp lit les Tab Configs dans %APPDATA%\warp\Warp\data.
+      const configDir = process.platform === 'win32'
+        ? path.join(process.env.APPDATA || path.join(home, 'AppData', 'Roaming'), 'warp', 'Warp', 'data', 'tab_configs')
+        : path.join(home, '.warp', 'tab_configs');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeFileSync(path.join(configDir, 'asanabar-task.toml'), toml, 'utf8');
 

@@ -1,7 +1,14 @@
 import { app, BrowserWindow } from 'electron';
+import started from 'electron-squirrel-startup';
 import { trayManager } from './main/tray';
 import { pollingService } from './main/services/polling';
 import { setupIpcHandlers } from './main/ipc/handlers';
+
+// Windows: Squirrel relance l'app pendant install/update pour créer les
+// raccourcis ; il faut quitter immédiatement dans ce cas.
+if (started) {
+  app.quit();
+}
 
 const gotTheLock = app.requestSingleInstanceLock();
 

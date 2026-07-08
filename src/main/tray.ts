@@ -194,15 +194,21 @@ class TrayManager {
   private positionWindow(window: BrowserWindow, trayBounds: Electron.Rectangle): void {
     const windowBounds = window.getBounds();
     const display = screen.getDisplayMatching(trayBounds);
+    const workArea = display.workArea;
 
     let x = Math.round(trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2);
-    const y = Math.round(trayBounds.y + trayBounds.height);
-
-    if (x < display.bounds.x) {
-      x = display.bounds.x;
+    // Sous la barre de menu (macOS) ; si ça déborde de la zone de travail
+    // (taskbar Windows en bas), bascule au-dessus de la zone tray.
+    let y = Math.round(trayBounds.y + trayBounds.height);
+    if (y + windowBounds.height > workArea.y + workArea.height) {
+      y = Math.max(workArea.y, Math.round(trayBounds.y - windowBounds.height));
     }
-    if (x + windowBounds.width > display.bounds.x + display.bounds.width) {
-      x = display.bounds.x + display.bounds.width - windowBounds.width;
+
+    if (x < workArea.x) {
+      x = workArea.x;
+    }
+    if (x + windowBounds.width > workArea.x + workArea.width) {
+      x = workArea.x + workArea.width - windowBounds.width;
     }
 
     window.setPosition(x, y);

@@ -29,8 +29,11 @@ const config: ForgeConfig = {
       icon: './assets/icons/icon.png',
       format: 'ULFO',
     }),
-    new MakerZIP({}, ['darwin']),
-    new MakerSquirrel({}),
+    new MakerZIP({}, ['darwin', 'win32']),
+    new MakerSquirrel({
+      setupIcon: './assets/icons/icon.ico',
+      iconUrl: 'https://raw.githubusercontent.com/ldubois/asanabar/main/assets/icons/icon.ico',
+    }),
     new MakerDeb({}),
     new MakerRpm({}),
   ],
