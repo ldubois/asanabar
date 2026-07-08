@@ -52,7 +52,10 @@ export function setupIpcHandlers(): void {
 
   // Opens a Warp session in the configured project dir and runs the configured
   // command (e.g. `claude "/asana-task <url>"`). Warp has no CLI for this: the
-  // supported way is a launch-configuration YAML opened via warp://launch/<path>.
+  // supported way is a Tab Config TOML opened via warp://tab_config/<name>,
+  // which adds a tab to the ACTIVE window (launch configurations always spawn
+  // a separate window). Warp re-reads the file on every launch, so we rewrite
+  // it with the task URL baked in each time.
   ipcMain.handle(IPC_CHANNELS.TASK_OPEN_IN_WARP, async (_, taskUrl: string) => {
     try {
       const url = String(taskUrl ?? '').trim();
@@ -67,26 +70,27 @@ export function setupIpcHandlers(): void {
       }
       const command = template.split('{url}').join(url);
 
-      const yamlQuote = (v: string) => '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
-      const yaml = [
-        '---',
-        'name: asanabar-task',
-        'windows:',
-        '  - tabs:',
-        '      - title: ' + yamlQuote(path.basename(projectDir)),
-        '        layout:',
-        '          cwd: ' + yamlQuote(projectDir),
-        '          commands:',
-        '            - exec: ' + yamlQuote(command),
+      const tomlQuote = (v: string) => '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+      // Mirrors the hand-made ~/.warp/tab_configs/grenouille.toml so the tab
+      // looks like any other grenouille session (title, green color).
+      const toml = [
+        'name = "asanabar-task"',
+        'title = ' + tomlQuote(path.basename(projectDir)),
+        'color = "green"',
+        '',
+        '[[panes]]',
+        'id = "main"',
+        'type = "terminal"',
+        'directory = ' + tomlQuote(projectDir),
+        'commands = [' + tomlQuote(command) + ']',
         '',
       ].join('\n');
 
-      const configDir = path.join(home, '.warp', 'launch_configurations');
+      const configDir = path.join(home, '.warp', 'tab_configs');
       fs.mkdirSync(configDir, { recursive: true });
-      const file = path.join(configDir, 'asanabar-task.yaml');
-      fs.writeFileSync(file, yaml, 'utf8');
+      fs.writeFileSync(path.join(configDir, 'asanabar-task.toml'), toml, 'utf8');
 
-      await shell.openExternal('warp://launch/' + file);
+      await shell.openExternal('warp://tab_config/asanabar-task');
       return { success: true };
     } catch (e: any) {
       return { success: false, error: e?.message || 'Échec du lancement Warp' };
