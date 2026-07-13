@@ -116,6 +116,9 @@ export function setupIpcHandlers(): void {
     if (key === 'refreshInterval' || key === 'workspaceGid' || key === 'mentionsDays') {
       pollingService.restart();
     }
+    if (key === 'launchAtStartup' && app.isPackaged) {
+      app.setLoginItemSettings({ openAtLogin: value === true });
+    }
     return { success: true };
   });
 

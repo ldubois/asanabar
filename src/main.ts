@@ -3,6 +3,7 @@ import started from 'electron-squirrel-startup';
 import { trayManager } from './main/tray';
 import { pollingService } from './main/services/polling';
 import { setupIpcHandlers } from './main/ipc/handlers';
+import { config } from './main/store/config';
 
 // Windows: Squirrel relance l'app pendant install/update pour créer les
 // raccourcis ; il faut quitter immédiatement dans ce cas.
@@ -24,6 +25,11 @@ if (!gotTheLock) {
   }
 
   app.whenReady().then(() => {
+    // En dev, setLoginItemSettings enregistrerait le binaire Electron nu.
+    if (app.isPackaged) {
+      app.setLoginItemSettings({ openAtLogin: config.get('launchAtStartup') === true });
+    }
+
     setupIpcHandlers();
     trayManager.initialize();
 

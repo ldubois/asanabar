@@ -35,7 +35,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   userName: '',
   refreshInterval: 120000,
   mentionsDays: 14,
-  launchAtStartup: false,
+  launchAtStartup: true,
   notifications: {
     enabled: true,
     newMention: true,
